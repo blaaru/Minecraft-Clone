@@ -1,0 +1,40 @@
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore Gradle-related files
+.gradle/
+build/
+out/
+
+# Ignore JAR dependencies (should be managed in Gradle)
+lib/
+*.jar
+
+# Ignore logs and crash dumps
+hs_err_pid*.log
+
+# Ignore IDE-specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+
+# Ignore compiled Java files
+*.class
+*.war
+*.ear
+
+# Ignore packaged distributions
+*.tar
+*.zip
+
+# Ignore test reports and cache files
+test-results/
+reports/
