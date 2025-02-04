@@ -2,6 +2,7 @@ package minecraft.clone;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPos;
@@ -17,13 +18,15 @@ public class Camera {
     private Vector3f forward;
     private Vector3f right;
     private final Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-    private final float speed = 0.1f; // movement speed
+    private final Vector3f velocity = new Vector3f(0.0f, 0.0f, 0.0f);
+    private final float speed = 4.317f; // movement speed
+    private final float acceleration = 47.5f;
     private final Matrix4f viewMatrix;
     private final float standHeight = 0.0f;
 
     // jump variables
     private float yVelocity = 0.0f;
-    private final float gravity = -0.01f;
+    private final float gravity = -32.0f;
     private boolean isJumping = false;
 
     // crouch variables
@@ -31,7 +34,10 @@ public class Camera {
     private final float crouchAmount = 0.21f;
 
     // sprinting vairables
-    private final float sprintAmount = 1.5f;
+    private final float sprintAmount = 1.3f;
+
+    // delta time varirables
+    private double lastTime = GLFW.glfwGetTime();
 
 
 
@@ -53,18 +59,29 @@ public class Camera {
         });
     }
 
+    public double getCurrentTime() {
+        return GLFW.glfwGetTime();
+    }
+
+    public double getDelta() {
+        double currentTime = getCurrentTime();
+        double delta = currentTime - lastTime;
+        lastTime = currentTime;
+        return delta;
+    }
+
     // jumping logic: update jump physics
-    public void jumpUpdate() {
+    public void jumpUpdate(double deltaTime) {
         // if jump is pressed: init jump
         if (movement.isJumpTriggered() && !isJumping) {
-            yVelocity = 0.2f; // adding jump velocity
+            yVelocity = 9.0f; // adding jump velocity
             isJumping = true; // jump becomes true
         }
 
         // jump phsycis
         if (isJumping) {
-            yVelocity += gravity; // applying grazvity
-            position.y += yVelocity; // update vertical position
+            yVelocity += gravity * deltaTime; // applying grazvity
+            position.y += yVelocity * deltaTime; // update vertical position
 
             // simple ground collision
             if (position.y < 0.0f) {
@@ -94,6 +111,8 @@ public class Camera {
 
     // new version -- combining viewmatrix in update movement!
     public void update() {
+        double deltaTime = getDelta();
+
         // calculate forward vector from yaw and pitch
         float yaw = movement.getYaw();
         float pitch = movement.getPitch();
@@ -129,19 +148,25 @@ public class Camera {
         }
         
         // only update if there is movement
+        // new version - replacing scalars to vectors -- adding velocity, acceleration.
+        float maxSpeed = movement.isSprinting() ? speed * sprintAmount : speed;
         if (moveDir.lengthSquared() > 0) {
-            // dot product type shit
-            float currentSpeed = speed;
-            Vector3f normMoveDir = new Vector3f(moveDir).normalize();
-            float dot = normMoveDir.dot(horizontalForward);
-            if (dot >= 0 && movement.isSprintingToggled()) {
-                currentSpeed *= sprintAmount;
-            }
-            moveDir.normalize().mul(currentSpeed);
-            position.add(moveDir);
+            Vector3f normalize = moveDir.normalize();
+            velocity.add(new Vector3f(normalize).mul(acceleration * (float) deltaTime));
+        } else {
+            float frictionFactor = 34.5f;
+            velocity.mul((float)(frictionFactor * deltaTime));
         }
 
-        jumpUpdate();
+        // speed is max velocity (clamping velocity)
+        if (velocity.length() > maxSpeed) {
+            velocity.set(velocity.normalize().mul(maxSpeed));
+        }
+
+        // updating velocity with acceleration
+        position.add(new Vector3f(velocity).mul((float)deltaTime));
+
+        jumpUpdate(deltaTime);
         crouchUpdate();
         
 

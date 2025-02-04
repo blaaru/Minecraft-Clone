@@ -26,6 +26,11 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 import org.lwjgl.system.MemoryUtil;
 
 public class Renderer {
+    private static final float BASE_FOV = 70.0f; // normal fov baby
+    private static final float SPRINT_FOV = 90.0f; // oh shit increased fov baby
+    private static final float FOV_SPEED = 10.0f; // wtf interpolating speed baby
+
+    private float currentFOV = BASE_FOV; // starting with normal fov baby
     private int shaderProgram;
     private int projectionLocation;
     private World world;
@@ -55,7 +60,7 @@ public class Renderer {
 
         // Projection matrix - increased far plane to 1000.0 to include skybox vertices
         projection = new Matrix4f().perspective(
-            (float) Math.toRadians(70.0f), // normal fov baby
+            (float) Math.toRadians(BASE_FOV), // normal fov baby
             800.0f / 600.0f, // aspect ratio type shit
             0.1f,
             1000.0f // nearrrrrrrrrr farrrrrrrr wheree evvveerrrrr you areeeeeeeeeeeeeee
@@ -71,6 +76,12 @@ public class Renderer {
     }
 
     public void render() {
+
+        float targetFOV = movement.isSprinting() ? SPRINT_FOV : BASE_FOV;
+        currentFOV += (targetFOV - currentFOV) * FOV_SPEED * 0.016f;
+
+        updateProjectionMatrix();
+
         // updating camera (updates view matrix)
         camera.update();
 
@@ -101,6 +112,16 @@ public class Renderer {
         // Render skybox using the shared projection and camera view
         skybox.render(projection, camera.getViewMatrix());
         glDepthFunc(GL_LESS); // restore depth test for world
+    }
+
+    // updating fov baby
+    public void updateProjectionMatrix() {
+        projection.identity().perspective(
+            (float) Math.toRadians(currentFOV),
+            800.0f / 600.0f,
+            0.1f,
+            1000.0f
+        );
     }
 
     public void cleanup() {

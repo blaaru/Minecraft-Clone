@@ -4,10 +4,9 @@ import org.lwjgl.glfw.GLFW;
 
 public class Movement {
     private boolean forward, backward, left, right, space, crouch;
+    private boolean sprinting = false;
     private boolean wasSpacePressed = false;
     private boolean jumpTriggered = false;
-    private boolean sprintToggeled = false; // curent toggle state
-    private boolean wasSprintKeyPressed = false; // to toggle
     private double lastX, lastY;
     private float yaw, pitch;
     private boolean mouse = true;
@@ -50,19 +49,15 @@ public class Movement {
         right = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS;
         space = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_SPACE) == GLFW.GLFW_PRESS;
         crouch = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS;
+
+        // sprint toggle
+        sprinting = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)  == GLFW.GLFW_PRESS && forward;
         
         if (space && !wasSpacePressed) {
             jumpTriggered = true;  
         }
         wasSpacePressed = space;
-
-        // sprint toggle
-        boolean currentSprintKey = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)  == GLFW.GLFW_PRESS;
-        if (currentSprintKey && !wasSprintKeyPressed) {
-            sprintToggeled = !sprintToggeled;
-        }
-
-        wasSprintKeyPressed = currentSprintKey;
+        
     }
 
     public boolean isJumpTriggered() {
@@ -99,8 +94,8 @@ public class Movement {
         return crouch;
     }
 
-    public boolean isSprintingToggled() {
-        return sprintToggeled;
+    public boolean isSprinting() {
+        return sprinting;
     }
 
 }
