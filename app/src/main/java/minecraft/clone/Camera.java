@@ -20,7 +20,7 @@ public class Camera {
     private final Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
     private final Vector3f velocity = new Vector3f(0.0f, 0.0f, 0.0f);
     private final float speed = 4.317f; // movement speed
-    private final float acceleration = 47.5f;
+    private final float acceleration = 34.7f; // accel
     private final Matrix4f viewMatrix;
     private final float standHeight = 0.0f;
 
@@ -154,7 +154,7 @@ public class Camera {
             Vector3f normalize = moveDir.normalize();
             velocity.add(new Vector3f(normalize).mul(acceleration * (float) deltaTime));
         } else {
-            float frictionFactor = 34.5f;
+            float frictionFactor = 10.4f;
             velocity.mul((float)(frictionFactor * deltaTime));
         }
 
@@ -168,7 +168,6 @@ public class Camera {
 
         jumpUpdate(deltaTime);
         crouchUpdate();
-        
 
         // Update view matrix
         viewMatrix.identity();

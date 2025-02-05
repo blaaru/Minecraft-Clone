@@ -23,11 +23,16 @@ import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
+
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
 public class Renderer {
-    private static final float BASE_FOV = 70.0f; // normal fov baby
-    private static final float SPRINT_FOV = 90.0f; // oh shit increased fov baby
+
+    private double lastFrameTime = GLFW.glfwGetTime();
+
+    static final float BASE_FOV = 70.0f; // normal fov baby
+    private static final float SPRINT_FOV = 95.0f; // oh shit increased fov baby
     private static final float FOV_SPEED = 10.0f; // wtf interpolating speed baby
 
     private float currentFOV = BASE_FOV; // starting with normal fov baby
@@ -76,17 +81,29 @@ public class Renderer {
     }
 
     public void render() {
+        // calculating delta time
+        double currentTime = GLFW.glfwGetTime();
+        double deltaTime = currentTime - lastFrameTime;
+        lastFrameTime = currentTime;
 
+        // fov interpolation using delta time
         float targetFOV = movement.isSprinting() ? SPRINT_FOV : BASE_FOV;
-        currentFOV += (targetFOV - currentFOV) * FOV_SPEED * 0.016f;
+        currentFOV += (targetFOV - currentFOV) * FOV_SPEED * (float) deltaTime;
 
+        // update projection matrix
         updateProjectionMatrix();
+
+        // re upload projection matrix to world shader
+        glUseProgram(shaderProgram);
+        FloatBuffer projectionBuffer = MemoryUtil.memAllocFloat(16);
+        projection.get(projectionBuffer);
+        glUniformMatrix4fv(projectionLocation, false, projectionBuffer);
+        MemoryUtil.memFree(projectionBuffer);
 
         // updating camera (updates view matrix)
         camera.update();
 
         // --- rendering world ---
-        glUseProgram(shaderProgram);
         // update view uniform for the world shader
         int viewLocation = glGetUniformLocation(shaderProgram, "view");
         FloatBuffer viewBuffer = MemoryUtil.memAllocFloat(16);
