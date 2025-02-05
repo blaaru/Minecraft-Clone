@@ -19,8 +19,12 @@ public class Camera {
     private Vector3f right;
     private final Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
     private final Vector3f velocity = new Vector3f(0.0f, 0.0f, 0.0f);
+
+    // movment variables
     private final float speed = 4.317f; // movement speed
-    private final float acceleration = 34.7f; // accel
+    private final float acceleration = 50.0f; // accel
+
+
     private final Matrix4f viewMatrix;
     private final float standHeight = 0.0f;
 
@@ -59,6 +63,10 @@ public class Camera {
         });
     }
 
+    public boolean isOnGround() {
+        return position.y <= 0.0f;
+    }
+
     public double getCurrentTime() {
         return GLFW.glfwGetTime();
     }
@@ -74,7 +82,7 @@ public class Camera {
     public void jumpUpdate(double deltaTime) {
         // if jump is pressed: init jump
         if (movement.isJumpTriggered() && !isJumping) {
-            yVelocity = 9.0f; // adding jump velocity
+            yVelocity = 9.81f; // adding jump velocity
             isJumping = true; // jump becomes true
         }
 
@@ -154,8 +162,14 @@ public class Camera {
             Vector3f normalize = moveDir.normalize();
             velocity.add(new Vector3f(normalize).mul(acceleration * (float) deltaTime));
         } else {
-            float frictionFactor = 10.4f;
-            velocity.mul((float)(frictionFactor * deltaTime));
+            float friction = 15.0f;
+            float decay = 1 - friction * (float)deltaTime;
+
+            if (decay < 0) {
+                decay = 0;
+            }
+
+            velocity.mul(decay);
         }
 
         // speed is max velocity (clamping velocity)

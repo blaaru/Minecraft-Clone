@@ -3,13 +3,16 @@ package minecraft.clone;
 import org.lwjgl.glfw.GLFW;
 
 public class Movement {
+    private Camera camera;
     private boolean forward, backward, left, right, space, crouch;
     private boolean sprinting = false;
-    private boolean wasSpacePressed = false;
     private boolean jumpTriggered = false;
     private double lastX, lastY;
     private float yaw, pitch;
     private boolean mouse = true;
+
+    private long lastTime = 0;
+    private final long jumpCooldown = 15; // ms
 
     public Movement() {
         lastX = 800 / 2;
@@ -23,6 +26,9 @@ public class Movement {
             lastX = xpos;
             lastY = ypos;
             mouse = false;
+
+            // init camera
+            camera = new Camera(0, this);
         }
     
         double xOffset = xpos - lastX;
@@ -43,6 +49,7 @@ public class Movement {
     
 
     public void update() {
+        // input states
         forward = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS;
         backward = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS;
         left = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS;
@@ -53,10 +60,11 @@ public class Movement {
         // sprint toggle
         sprinting = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)  == GLFW.GLFW_PRESS && forward;
         
-        if (space && !wasSpacePressed) {
-            jumpTriggered = true;  
+        long currentTime = System.currentTimeMillis();
+        if (space && camera.isOnGround() && (currentTime - lastTime >= jumpCooldown)) {
+            jumpTriggered = true;
+            lastTime = currentTime;
         }
-        wasSpacePressed = space;
         
     }
 
