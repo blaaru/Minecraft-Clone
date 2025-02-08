@@ -56,7 +56,6 @@ public class App {
         }
     
         private void init() {
-            movement = new Movement();
 
             if (!glfwInit()) {
                 throw new IllegalStateException("Unable to initialize GLFW!");
@@ -81,7 +80,9 @@ public class App {
     
             glEnable(GL_DEPTH_TEST); // init depth testing
             glViewport(0, 0, 800, 600);
-    
+
+            
+            movement = new Movement();
             renderer = new Renderer(movement);
             renderer.init();
             System.out.println("Game has started!");

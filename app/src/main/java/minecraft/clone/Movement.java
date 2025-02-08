@@ -19,6 +19,8 @@ public class Movement {
         lastY = 600 / 2;
         yaw = -90.0f;
         pitch = 0.0f;
+
+        camera = new Camera(0, this);
     }
 
     public void updateMouse(double xpos, double ypos) {

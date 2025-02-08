@@ -8,6 +8,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
+import org.lwjgl.system.MemoryUtil;
 
 
 
@@ -53,6 +54,10 @@ public class Camera {
     }
 
     private void initCaptureMouse() {
+        if (App.getWindow() == MemoryUtil.NULL) {
+            throw new IllegalStateException("Window is not initialized!");
+        }
+
         System.out.println("Capturing mouse...");
         glfwSetInputMode(App.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursorPos(App.getWindow(), 800 / 2, 600 / 2);
