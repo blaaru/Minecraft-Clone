@@ -1,19 +1,3 @@
-/*
- * i'm so sad
- * i'm so very very sad
- * i'm so sad
- * i'm so very very sad
- * i'm so sad
- * i'm so very very sad
- * i'm so sad
- * i'm so very very sad
- * i'm so sad
- */
-
-// hehe im ok
-// path: app/src/main/java/minecraft/clone/App.java
-
-
 // version 330 core
 // @auth @blakebalbin @github
 package minecraft.clone;
@@ -48,6 +32,7 @@ public class App {
     private static long window;
         private Renderer renderer;
         private Movement movement;
+
     
         public void run() {
             init();
@@ -66,11 +51,14 @@ public class App {
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
+            System.out.println("Window is initializing....");
             window = glfwCreateWindow(800, 600, "Minecraft Demo", MemoryUtil.NULL, MemoryUtil.NULL);
             if (window == MemoryUtil.NULL) {
-                throw new RuntimeException("Failed to create the GLFW window!");
+                throw new RuntimeException("GLFW window creation failed: Check display settings or OpenGL drivers.");
+            } else {
+                System.out.println("Window is initialized!");
             }
-    
+
             // Center window
             GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             glfwSetWindowPos(window, (vidMode.width() - 800) / 2, (vidMode.height() - 600) / 2);
@@ -92,10 +80,11 @@ public class App {
             while (!glfwWindowShouldClose(window)) {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                // update keyboard state
+                // sync the player movement with the current frames input
                 movement.update();
 
-                // render scene (it also updates camera)
+                // render and update the camera for every frame
+                renderer.getWorld().update(renderer.getCamera().getPosition());
                 renderer.render();  
 
                 glfwSwapBuffers(window);

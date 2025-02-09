@@ -3,8 +3,8 @@ package minecraft.clone;
 import org.lwjgl.glfw.GLFW;
 
 public class Movement {
-    private Camera camera;
-    private boolean forward, backward, left, right, space, crouch;
+    public Camera camera;
+    private boolean forward, backward, left, right, space, crouch, escape;
     private boolean sprinting = false;
     private boolean jumpTriggered = false;
     private double lastX, lastY;
@@ -20,6 +20,7 @@ public class Movement {
         yaw = -90.0f;
         pitch = 0.0f;
 
+        // init camera (if removed, NullPointerException error occurs because camera cannot be null)
         camera = new Camera(0, this);
     }
 
@@ -58,6 +59,8 @@ public class Movement {
         right = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS;
         space = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_SPACE) == GLFW.GLFW_PRESS;
         crouch = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS;
+        escape = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_ESCAPE) == GLFW.GLFW_PRESS;
+
 
         // sprint toggle
         sprinting = GLFW.glfwGetKey(App.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)  == GLFW.GLFW_PRESS && forward;
@@ -66,14 +69,19 @@ public class Movement {
         if (space && camera.isOnGround() && (currentTime - lastTime >= jumpCooldown)) {
             jumpTriggered = true;
             lastTime = currentTime;
-        }
+        }        
         
     }
+
 
     public boolean isJumpTriggered() {
         boolean triggered = jumpTriggered;
         jumpTriggered = false;
         return triggered;
+    }
+
+    public boolean isKeyPressed(int key) {
+        return GLFW.glfwGetKey(App.getWindow(), key) == GLFW.GLFW_PRESS;
     }
 
     public float getPitch() {
@@ -106,6 +114,10 @@ public class Movement {
 
     public boolean isSprinting() {
         return sprinting;
+    }
+
+    public boolean isEscapePressed() {
+        return escape;
     }
 
 }

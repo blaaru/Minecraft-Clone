@@ -3,11 +3,14 @@ package minecraft.clone;
 import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
@@ -34,6 +37,7 @@ import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
@@ -57,13 +61,14 @@ public class Skybox {
     };
 
     private static final int[] skyboxIndices = {
-        0, 1, 2, 2, 3, 0,  
-        4, 5, 6, 6, 7, 4,  
-        0, 1, 5, 5, 4, 0,  
-        3, 2, 6, 6, 7, 3,  
-        1, 2, 6, 6, 5, 1,  
-        0, 3, 7, 7, 4, 0   
+        0, 1, 2, 2, 3, 0,  // Back face
+        4, 5, 6, 6, 7, 4,  // Front face
+        1, 5, 6, 6, 2, 1,  // Right face
+        0, 4, 7, 7, 3, 0,  // Left face
+        3, 2, 6, 6, 7, 3,  // Top face
+        0, 1, 5, 5, 4, 0   // Bottom face
     };
+
     
         public void init() {
         
@@ -102,7 +107,7 @@ public class Skybox {
 
     public void render(Matrix4f projection, Matrix4f view) {
         Matrix4f skyboxView = new Matrix4f(view);
-        skyboxView.m30(0).m31(0).m32(0);
+        skyboxView.setTranslation(0, 0, 0);
 
         FloatBuffer projectionBuffer = MemoryUtil.memAllocFloat(16);
         FloatBuffer viewBuffer = MemoryUtil.memAllocFloat(16);
@@ -117,9 +122,13 @@ public class Skybox {
         MemoryUtil.memFree(projectionBuffer);
         MemoryUtil.memFree(viewBuffer);
 
+        glDisable(GL_CULL_FACE);
+        glUseProgram(shaderProgram);
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, skyboxIndices.length, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+        glEnable(GL_CULL_FACE);
+        
     }
 
     private int createShaderProgram() {

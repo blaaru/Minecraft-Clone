@@ -8,22 +8,21 @@ import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
-import org.lwjgl.system.MemoryUtil;
 
 
 
 public class Camera {
     // instance variables
     private final Vector3f position;
-    private final Movement movement;
     private Vector3f forward;
     private Vector3f right;
     private final Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
     private final Vector3f velocity = new Vector3f(0.0f, 0.0f, 0.0f);
 
     // movment variables
-    private final float speed = 4.317f; // movement speed
-    private final float acceleration = 50.0f; // accel
+    private final Movement movement;
+    private final float speed = 4.317f; // regular movement speed
+    private final float acceleration = 50.0f;
 
 
     private final Matrix4f viewMatrix;
@@ -54,10 +53,6 @@ public class Camera {
     }
 
     private void initCaptureMouse() {
-        if (App.getWindow() == MemoryUtil.NULL) {
-            throw new IllegalStateException("Window is not initialized!");
-        }
-
         System.out.println("Capturing mouse...");
         glfwSetInputMode(App.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursorPos(App.getWindow(), 800 / 2, 600 / 2);
@@ -124,6 +119,7 @@ public class Camera {
 
     // new version -- combining viewmatrix in update movement!
     public void update() {
+        //System.out.println("Player Y: " + getPosition().y);
         double deltaTime = getDelta();
 
         // calculate forward vector from yaw and pitch
