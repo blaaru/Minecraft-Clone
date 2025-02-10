@@ -138,9 +138,9 @@ public class World {
 
                                             for (int face = 0; face < 6; face++) {
                                                 switch (face) {
-                                                    case 0 -> // Top face
+                                                    case 5 -> // Top face
                                                         grassTopTexture.bind();
-                                                    case 1 -> // Bottom face
+                                                    case 4 -> // Bottom face
                                                         dirtTexture.bind();
                                                     default -> // Side faces
                                                         grassSideTexture.bind();
