@@ -120,7 +120,7 @@ public class World {
                                 for (int z = 0; z < Chunk.CHUNK_SIZE_Z; z++) {
                                     if (currentChunk.getBlock(x, y, z) != 0) {
                                         float worldX = (cx * Chunk.CHUNK_SIZE_X) + x;
-                                        float worldY = y - (Chunk.CHUNK_SIZE_Y / 1.6f);
+                                        float worldY = y - (Chunk.CHUNK_SIZE_Y / 5.2f);
                                         float worldZ = (cz * Chunk.CHUNK_SIZE_Z) + z;
     
                                         if (frustum.isBlockVisible(worldX, worldY, worldZ)) {

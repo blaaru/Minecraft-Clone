@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Terrain {
     // instance variables
-    private final float amplitude = 128.0f;
+    private final float amplitude = 32.0f;
     private final float scaleCoords = 0.01f; // Controls how big the noise scale is generating per noise image
     private final int numOctaves = 4; // Number of noise layers we combine, 4 is enough to simulate natural looking terrain
     private final double persistence = 0.5f; // The factor we use to reduce the amplitude for each layer so all layers don't blast at max amp
